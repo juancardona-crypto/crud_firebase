@@ -1,8 +1,9 @@
 package com.example.crud_firebase.domain.usecase.draft
 
 import com.example.crud_firebase.domain.repository.DraftRepository
+import javax.inject.Inject
 
-class DeleteDraftUseCase(
+class DeleteDraftUseCase @Inject constructor(
     private val draftRepository: DraftRepository
 ) {
     suspend operator fun invoke(draftId: Int): Result<Unit> {

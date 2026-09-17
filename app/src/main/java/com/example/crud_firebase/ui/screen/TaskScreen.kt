@@ -1,5 +1,6 @@
 package com.example.crud_firebase.ui.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -29,16 +31,38 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.crud_firebase.domain.model.Task
 import com.example.crud_firebase.ui.TaskViewModel
+import com.example.crud_firebase.ui.auth.AuthViewModel
 
 @Composable
-fun TaskScreen(viewModel: TaskViewModel = viewModel ()) {
+fun TaskScreen(
+    viewModel: TaskViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
+    onLogout: () -> Unit
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var newTaskTitle by remember { mutableStateOf("") }
+    
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "Mis Tareas", style = MaterialTheme.typography.headlineSmall)
+            IconButton(onClick = {
+                authViewModel.logout()
+                onLogout()
+            }) {
+                Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Cerrar sesión")
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(8.dp))
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
                 value = newTaskTitle,
@@ -61,8 +85,8 @@ fun TaskScreen(viewModel: TaskViewModel = viewModel ()) {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator() }
-            uiState.error != null -> Text(
-                text = "Error: ${uiState.error}",
+            uiState.errorMessage != null -> Text(
+                text = "Error: ${uiState.errorMessage}",
                 color = MaterialTheme.colorScheme.error
             )
             else -> LazyColumn {

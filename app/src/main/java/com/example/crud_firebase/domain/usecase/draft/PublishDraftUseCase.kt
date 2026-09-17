@@ -4,8 +4,9 @@ import com.example.crud_firebase.domain.model.Task
 import com.example.crud_firebase.domain.model.TaskDraft
 import com.example.crud_firebase.domain.repository.DraftRepository
 import com.example.crud_firebase.domain.repository.TaskRepository
+import javax.inject.Inject
 
-class PublishDraftUseCase(
+class PublishDraftUseCase @Inject constructor(
     private val taskRepository: TaskRepository,
     private val draftRepository: DraftRepository
 ) {

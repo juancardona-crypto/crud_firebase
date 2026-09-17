@@ -2,55 +2,73 @@ package com.example.crud_firebase.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.crud_firebase.data.TaskRepository
 import com.example.crud_firebase.domain.model.Task
+import com.example.crud_firebase.domain.repository.AuthRepository
+import com.example.crud_firebase.domain.usecase.task.CreateTaskUseCase
+import com.example.crud_firebase.domain.usecase.task.DeleteTaskUseCase
+import com.example.crud_firebase.domain.usecase.task.GetTasksUseCase
+import com.example.crud_firebase.domain.usecase.task.UpdateTaskUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-data class TaskUiState(
+data class TaskListUiState(
     val tasks: List<Task> = emptyList(),
-    val isLoading: Boolean = true,
-    val error: String? = null
-
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
 )
-class TaskViewModel(
-    private val repository: TaskRepository = TaskRepository()
+
+@HiltViewModel
+class TaskViewModel @Inject constructor(
+    private val getTasksUseCase: GetTasksUseCase,
+    private val createTaskUseCase: CreateTaskUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val updateTaskUseCase: UpdateTaskUseCase,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(TaskUiState())
-    val uiState: StateFlow<TaskUiState> = _uiState.asStateFlow()
+
+    private val _uiState = MutableStateFlow(TaskListUiState())
+    val uiState: StateFlow<TaskListUiState> = _uiState.asStateFlow()
+
     init {
-        observeTasks()
+        authRepository.currentUserId?.let { observeTasks(it) }
     }
-    private fun observeTasks() {
+
+    private fun observeTasks(ownerId: String) {
         viewModelScope.launch {
-            repository.observeTasks()
-                .catch { e -> _uiState.update { it.copy(error = e.message, isLoading =
-                    false) } }
+            _uiState.update { it.copy(isLoading = true) }
+            getTasksUseCase(ownerId)
+                .catch { e -> _uiState.update { it.copy(errorMessage = e.message, isLoading = false) } }
                 .collect { tasks ->
-                    _uiState.update { it.copy(tasks = tasks, isLoading = false, error =
-                        null) }
+                    _uiState.update { it.copy(tasks = tasks, isLoading = false, errorMessage = null) }
                 }
         }
     }
+
     fun addTask(title: String) {
+        val ownerId = authRepository.currentUserId ?: return
         if (title.isBlank()) return
         viewModelScope.launch {
-            runCatching { repository.addTask(Task(title = title)) }
-                .onFailure { e -> _uiState.update { it.copy(error = e.message) } }
+            val now = System.currentTimeMillis()
+            createTaskUseCase(Task(title = title, ownerId = ownerId, createdAt = now, updatedAt = now))
+                .onFailure { e -> _uiState.update { it.copy(errorMessage = e.message) } }
         }
     }
+
     fun toggleCompleted(task: Task) {
         viewModelScope.launch {
-            repository.updateTask(task.id, mapOf("completed" to !task.completed))
+            updateTaskUseCase(task.copy(completed = !task.completed, updatedAt = System.currentTimeMillis()))
         }
     }
+
     fun deleteTask(task: Task) {
         viewModelScope.launch {
-            repository.deleteTask(task.id)
+            deleteTaskUseCase(task.id)
         }
     }
 }

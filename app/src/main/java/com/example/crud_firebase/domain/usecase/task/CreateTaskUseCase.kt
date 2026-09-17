@@ -2,8 +2,9 @@ package com.example.crud_firebase.domain.usecase.task
 
 import com.example.crud_firebase.domain.model.Task
 import com.example.crud_firebase.domain.repository.TaskRepository
+import javax.inject.Inject
 
-class CreateTaskUseCase(
+class CreateTaskUseCase @Inject constructor(
     private val taskRepository: TaskRepository
 ) {
     suspend operator fun invoke(task: Task): Result<String> {

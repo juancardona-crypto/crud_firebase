@@ -2,8 +2,9 @@ package com.example.crud_firebase.domain.usecase.draft
 
 import com.example.crud_firebase.domain.model.TaskDraft
 import com.example.crud_firebase.domain.repository.DraftRepository
+import javax.inject.Inject
 
-class SaveDraftUseCase(
+class SaveDraftUseCase @Inject constructor(
     private val draftRepository: DraftRepository
 ) {
     suspend operator fun invoke(draft: TaskDraft): Result<Long> {

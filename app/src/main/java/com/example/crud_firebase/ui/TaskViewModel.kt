@@ -50,19 +50,20 @@ class TaskViewModel @Inject constructor(
         }
     }
 
-    fun addTask(title: String) {
+    fun addTask(title: String, description: String = "") {
         val ownerId = authRepository.currentUserId ?: return
         if (title.isBlank()) return
         viewModelScope.launch {
             val now = System.currentTimeMillis()
-            createTaskUseCase(Task(title = title, ownerId = ownerId, createdAt = now, updatedAt = now))
+            createTaskUseCase(Task(title = title, description = description, ownerId = ownerId, createdAt = now, updatedAt = now))
                 .onFailure { e -> _uiState.update { it.copy(errorMessage = e.message) } }
         }
     }
 
-    fun toggleCompleted(task: Task) {
+    fun updateTask(task: Task) {
         viewModelScope.launch {
-            updateTaskUseCase(task.copy(completed = !task.completed, updatedAt = System.currentTimeMillis()))
+            updateTaskUseCase(task.copy(updatedAt = System.currentTimeMillis()))
+                .onFailure { e -> _uiState.update { it.copy(errorMessage = e.message) } }
         }
     }
 

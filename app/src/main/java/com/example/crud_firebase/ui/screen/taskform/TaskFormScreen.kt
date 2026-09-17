@@ -3,6 +3,7 @@ package com.example.crud_firebase.ui.screen.taskform
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,11 +13,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.crud_firebase.domain.model.Task
 import com.example.crud_firebase.ui.TaskViewModel
 
+import com.example.crud_firebase.ui.screen.drafts.DraftViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskFormScreen(
     taskId: String? = null,
     viewModel: TaskViewModel = hiltViewModel(),
+    draftViewModel: DraftViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -39,6 +43,14 @@ fun TaskFormScreen(
                     }
                 },
                 actions = {
+                    if (taskId == null) {
+                        IconButton(onClick = {
+                            draftViewModel.saveDraft(title, description)
+                            onNavigateBack()
+                        }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Guardar Borrador")
+                        }
+                    }
                     IconButton(onClick = {
                         if (taskId == null) {
                             viewModel.addTask(title, description)
@@ -49,7 +61,7 @@ fun TaskFormScreen(
                         }
                         onNavigateBack()
                     }) {
-                        Icon(Icons.Default.Save, contentDescription = "Guardar")
+                        Icon(Icons.Default.Save, contentDescription = "Publicar/Guardar")
                     }
                 }
             )

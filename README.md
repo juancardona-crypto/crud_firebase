@@ -14,15 +14,57 @@ La aplicación sigue los principios de **Clean Architecture** y el patrón de di
 - **Capa Data**: Implementación de repositorios que coordinan Firestore (Remoto) y Room (Local).
 - **DI (Hilt)**: Inyección de dependencias centralizada para desacoplamiento total.
 
-### Diagrama de Flujo
+### 🏗️ Arquitectura del Sistema
+El proyecto utiliza una arquitectura de **Capas Limpias (Clean Architecture)** con el patrón **MVVM**. Este diagrama muestra cómo fluye la información:
+
 ```mermaid
-graph LR
-    UI[Interfaz] --> VM[ViewModel]
-    VM --> UC[Casos de Uso]
-    UC --> Repositorio
-    Repositorio --> Firestore[Nube: Firestore]
-    Repositorio --> Room[Local: Room]
+graph TD
+    %% Definición de Estilos (Colores como en draw.io)
+    classDef ui fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000;
+    classDef domain fill:#f1f8e9,stroke:#33691e,stroke-width:2px,color:#000;
+    classDef data fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000;
+    classDef di fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000;
+
+    subgraph UI ["📱 CAPA DE INTERFAZ (UI)"]
+        A[<b>Login / Registro</b><br/>Composables] --- B[<b>Lista de Tareas</b><br/>LazyColumn]
+        B --- C[<b>Formulario</b><br/>Inputs]
+        VM[<b>Auth & Task ViewModels</b><br/>Manejo de Estado / StateFlow]
+    end
+
+    subgraph DOMAIN ["⚙️ CAPA DE DOMINIO"]
+        UC{<b>Casos de Uso</b><br/>Lógica de Negocio}
+        Models(<b>Modelos de Datos</b><br/>Task / TaskDraft)
+    end
+
+    subgraph DATA ["💾 CAPA DE DATOS"]
+        REPOS[<b>Repositorios</b><br/>Sincronización]
+        Firestore[(☁️ <b>Firebase Firestore</b><br/>Nube)]
+        Room[(🏠 <b>Room Database</b><br/>Local)]
+    end
+
+    subgraph INFRA ["🛠️ INFRAESTRUCTURA"]
+        Hilt{<b>Hilt</b><br/>Inyección de Dependencias}
+    end
+
+    %% Conexiones
+    A & B & C --> VM
+    VM --> UC
+    UC --> Models
+    UC --> REPOS
+    REPOS --> Firestore
+    REPOS --> Room
+    Hilt -.-> VM
+    Hilt -.-> REPOS
+
+    %% Asignación de clases
+    class A,B,C,VM ui;
+    class UC,Models domain;
+    class REPOS,Firestore,Room data;
+    class Hilt di;
 ```
+
+> **Nota**: Este diagrama se genera dinámicamente. Al subirlo a GitHub, verás rectángulos de colores (Azul para UI, Verde para Dominio, Naranja para Datos) que explican la separación de responsabilidades.
+
 
 ## 🛠️ Tecnologías
 - **Firebase Auth**: Autenticación segura de usuarios.

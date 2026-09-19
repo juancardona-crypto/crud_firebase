@@ -1,33 +1,54 @@
-# Gestor Personal de Tareas
+# Gestor Personal de Tareas (Taller Sena)
 
 ## Descripción
-Aplicación Android desarrollada con Kotlin y Jetpack Compose que implementa autenticación mediante Firebase, operaciones CRUD con Cloud Firestore y almacenamiento local de borradores mediante Room.
+Aplicación Android robusta desarrollada con **Kotlin** y **Jetpack Compose**. Implementa una solución completa de gestión de tareas con sincronización en la nube y persistencia local para borradores.
 
-## Tecnologías
-- **Interfaz**: Jetpack Compose
-- **Arquitectura**: MVVM con Clean Architecture (Capas: UI, Domain, Data, DI)
-- **Base de Datos Remota**: Cloud Firestore
-- **Base de Datos Local**: Room (Borradores)
-- **Autenticación**: Firebase Auth
-- **Inyección de Dependencias**: Hilt
-- **Navegación**: Navigation Compose
-- **Asincronía**: Corrutinas y Flow
+## Integrantes
+- Juan Diego Cardona
 
-## Estructura de Paquetes
-- `data`: Implementación de repositorios, DAOs, entidades de Room y modelos de red.
-- `domain`: Modelos de negocio, interfaces de repositorio y casos de uso.
-- `ui`: Pantallas (Login, Register, TaskList, TaskForm, Drafts), ViewModels y estados.
-- `di`: Módulos de Hilt para proveer dependencias.
+## 🏗️ Arquitectura
+La aplicación sigue los principios de **Clean Architecture** y el patrón de diseño **MVVM**:
 
-## Cómo configurar
-1. Vincular el proyecto con Firebase Console.
-2. Descargar `google-services.json` y colocarlo en la carpeta `app/`.
-3. Habilitar Email/Password en Firebase Auth.
-4. Habilitar Firestore Database en modo de prueba.
+- **Capa UI (Compose)**: Pantallas reactivas que observan el estado mediante `StateFlow`.
+- **Capa Domain**: Contiene la lógica de negocio pura, modelos y Casos de Uso (`UseCases`).
+- **Capa Data**: Implementación de repositorios que coordinan Firestore (Remoto) y Room (Local).
+- **DI (Hilt)**: Inyección de dependencias centralizada para desacoplamiento total.
 
-## Funcionalidades
-- [x] Registro e Inicio de sesión.
-- [x] Persistencia de sesión.
-- [x] CRUD completo de tareas en la nube.
-- [x] Gestión de borradores locales (Room) sin conexión.
-- [x] Publicación segura de borradores.
+### Diagrama de Flujo
+```mermaid
+graph LR
+    UI[Interfaz] --> VM[ViewModel]
+    VM --> UC[Casos de Uso]
+    UC --> Repositorio
+    Repositorio --> Firestore[Nube: Firestore]
+    Repositorio --> Room[Local: Room]
+```
+
+## 🛠️ Tecnologías
+- **Firebase Auth**: Autenticación segura de usuarios.
+- **Cloud Firestore**: Almacenamiento remoto en tiempo real.
+- **Room Database**: Manejo de borradores sin conexión.
+- **Hilt**: Inyección de dependencias.
+- **Navigation Compose**: Navegación entre pantallas.
+- **Corrutinas & Flow**: Manejo de asincronía.
+
+## 📊 Matriz de Pruebas (Registro de Ejecución)
+
+| ID | Caso de Prueba | Resultado Esperado | Estado |
+| :--- | :--- | :--- | :--- |
+| **P01** | Registro de usuario | Usuario creado con éxito en Firebase | ✅ Exitoso |
+| **P02** | Correo duplicado | Muestra error: "Correo ya en uso" | ✅ Exitoso |
+| **P03** | Credenciales inválidas | Bloquea acceso con mensaje en español | ✅ Exitoso |
+| **P04** | Persistencia de sesión | Inicia directo en la lista si hay sesión | ✅ Exitoso |
+| **P05** | Cierre de sesión | Limpia historial (RF03) y va al Login | ✅ Exitoso |
+| **P06** | CRUD Firestore | Cambios reflejados en la consola web | ✅ Exitoso |
+| **P07** | Aislamiento de datos | Usuario B no puede ver tareas de A | ✅ Exitoso |
+| **P08** | Borradores locales | Borrador persiste tras cerrar la app | ✅ Exitoso |
+| **P09** | Publicación exitosa | Tarea se crea en nube y se borra de local | ✅ Exitoso |
+| **P10** | Fallo de conexión | Borrador se mantiene si falla el envío | ✅ Exitoso |
+
+## 🚀 Configuración
+1. Clonar el repositorio.
+2. Asegurar que el archivo `app/google-services.json` esté presente.
+3. Compilar el proyecto en Android Studio (Ladybug+).
+4. El archivo APK se encuentra en la carpeta de entregables del proyecto.

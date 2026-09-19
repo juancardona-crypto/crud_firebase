@@ -16,6 +16,7 @@ import javax.inject.Inject
 
 data class AuthUiState(
     val isLoading: Boolean = false,
+    val isInitializing: Boolean = true,
     val userId: String? = null,
     val error: String? = null,
     val isSuccess: Boolean = false
@@ -35,7 +36,7 @@ class AuthViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             getCurrentUserUseCase.observeAuthState().collect { uid ->
-                _uiState.update { it.copy(userId = uid) }
+                _uiState.update { it.copy(userId = uid, isInitializing = false) }
             }
         }
     }

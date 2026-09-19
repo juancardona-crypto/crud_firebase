@@ -12,18 +12,11 @@ import com.example.crud_firebase.ui.auth.AuthViewModel
 @Composable
 fun LoginScreen(
     viewModel: AuthViewModel,
-    onNavigateToRegister: () -> Unit,
-    onLoginSuccess: () -> Unit
+    onNavigateToRegister: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
-    LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) {
-            onLoginSuccess()
-        }
-    }
 
     Column(
         modifier = Modifier

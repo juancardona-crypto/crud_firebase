@@ -1,6 +1,7 @@
 package com.example.crud_firebase.data.repository
 
 import com.example.crud_firebase.domain.repository.AuthRepository
+import com.example.crud_firebase.util.toUserFriendlyMessage
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +32,7 @@ class AuthRepositoryImpl @Inject constructor(
             val userId = result.user?.uid ?: throw Exception("Error al obtener ID de usuario")
             Result.success(userId)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(e.toUserFriendlyMessage()))
         }
     }
 
@@ -41,7 +42,7 @@ class AuthRepositoryImpl @Inject constructor(
             val userId = result.user?.uid ?: throw Exception("Error al obtener ID de usuario")
             Result.success(userId)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(e.toUserFriendlyMessage()))
         }
     }
 

@@ -1,7 +1,11 @@
 package com.example.crud_firebase.data.repository
 
+import com.example.crud_firebase.data.mapper.toDocument
+import com.example.crud_firebase.data.mapper.toDomain
+import com.example.crud_firebase.data.remote.model.TaskDocument
 import com.example.crud_firebase.domain.model.Task
 import com.example.crud_firebase.domain.repository.TaskRepository
+import com.example.crud_firebase.util.toUserFriendlyMessage
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
@@ -24,11 +28,11 @@ class TaskRepositoryImpl @Inject constructor(
 
         val listener = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                close(error)
+                close(Exception(error.toUserFriendlyMessage()))
                 return@addSnapshotListener
             }
             val tasks = snapshot?.documents?.mapNotNull { doc ->
-                doc.toObject(Task::class.java)?.copy(id = doc.id)
+                doc.toObject(TaskDocument::class.java)?.toDomain()
             } ?: emptyList()
             trySend(tasks)
         }
@@ -37,25 +41,26 @@ class TaskRepositoryImpl @Inject constructor(
 
     override suspend fun createTask(task: Task): Result<String> {
         return try {
-            val ref = tasksRef.add(task).await()
+            val ref = tasksRef.add(task.toDocument()).await()
             Result.success(ref.id)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(e.toUserFriendlyMessage()))
         }
     }
 
     override suspend fun updateTask(task: Task): Result<Unit> {
         return try {
+            val document = task.toDocument()
             val updates = mapOf(
-                "title" to task.title,
-                "description" to task.description,
-                "completed" to task.completed,
+                "title" to document.title,
+                "description" to document.description,
+                "completed" to document.completed,
                 "updatedAt" to System.currentTimeMillis()
             )
             tasksRef.document(task.id).update(updates).await()
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(e.toUserFriendlyMessage()))
         }
     }
 
@@ -64,7 +69,7 @@ class TaskRepositoryImpl @Inject constructor(
             tasksRef.document(taskId).delete().await()
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(e.toUserFriendlyMessage()))
         }
     }
 }

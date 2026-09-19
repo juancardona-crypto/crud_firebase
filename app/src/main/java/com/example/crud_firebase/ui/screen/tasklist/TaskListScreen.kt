@@ -34,8 +34,7 @@ fun TaskListScreen(
     viewModel: TaskViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel(),
     onNavigateToForm: (String?) -> Unit,
-    onNavigateToDrafts: () -> Unit,
-    onLogout: () -> Unit
+    onNavigateToDrafts: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -49,7 +48,6 @@ fun TaskListScreen(
                     }
                     IconButton(onClick = {
                         authViewModel.logout()
-                        onLogout()
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Cerrar sesión")
                     }
@@ -65,11 +63,24 @@ fun TaskListScreen(
         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             when {
                 uiState.isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                uiState.errorMessage != null -> Text(
-                    text = "Error: ${uiState.errorMessage}",
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                uiState.errorMessage != null -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = uiState.errorMessage!!,
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        if (uiState.errorMessage!!.contains("Sincronizando")) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
                 uiState.tasks.isEmpty() -> Text(
                     text = "No hay tareas pendientes",
                     modifier = Modifier.align(Alignment.Center)

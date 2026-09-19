@@ -12,20 +12,13 @@ import com.example.crud_firebase.ui.auth.AuthViewModel
 @Composable
 fun RegisterScreen(
     viewModel: AuthViewModel,
-    onNavigateBack: () -> Unit,
-    onRegisterSuccess: () -> Unit
+    onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var validationError by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) {
-            onRegisterSuccess()
-        }
-    }
 
     Column(
         modifier = Modifier

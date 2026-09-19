@@ -42,28 +42,10 @@ fun TaskFormScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
-                actions = {
-                    if (taskId == null) {
-                        IconButton(onClick = {
-                            draftViewModel.saveDraft(title, description)
-                            onNavigateBack()
-                        }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Guardar Borrador")
-                        }
-                    }
-                    IconButton(onClick = {
-                        if (taskId == null) {
-                            viewModel.addTask(title, description)
-                        } else {
-                            existingTask?.let {
-                                viewModel.updateTask(it.copy(title = title, description = description))
-                            }
-                        }
-                        onNavigateBack()
-                    }) {
-                        Icon(Icons.Default.Save, contentDescription = "Publicar/Guardar")
-                    }
-                }
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             )
         }
     ) { innerPadding ->
@@ -71,7 +53,8 @@ fun TaskFormScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(16.dp)
-                .fillMaxSize()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             OutlinedTextField(
                 value = title,
@@ -79,7 +62,7 @@ fun TaskFormScreen(
                 label = { Text("Título") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -87,6 +70,41 @@ fun TaskFormScreen(
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3
             )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            if (taskId == null) {
+                OutlinedButton(
+                    onClick = {
+                        draftViewModel.saveDraft(title, description)
+                        onNavigateBack()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Edit, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Guardar como Borrador (Local)")
+                }
+            }
+
+            Button(
+                onClick = {
+                    if (taskId == null) {
+                        viewModel.addTask(title, description)
+                    } else {
+                        existingTask?.let {
+                            viewModel.updateTask(it.copy(title = title, description = description))
+                        }
+                    }
+                    onNavigateBack()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = title.isNotBlank()
+            ) {
+                Icon(Icons.Default.Save, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(if (taskId == null) "Publicar Tarea" else "Guardar Cambios")
+            }
         }
     }
 }

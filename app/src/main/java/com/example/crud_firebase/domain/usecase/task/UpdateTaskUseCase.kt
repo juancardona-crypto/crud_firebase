@@ -14,6 +14,9 @@ class UpdateTaskUseCase @Inject constructor(
         if (task.title.isBlank()) {
             return Result.failure(IllegalArgumentException("El título no puede estar vacío"))
         }
+        if (task.description.isBlank()) {
+            return Result.failure(IllegalArgumentException("La descripción no puede estar vacía"))
+        }
         return taskRepository.updateTask(task)
     }
 }

@@ -11,6 +11,9 @@ class CreateTaskUseCase @Inject constructor(
         if (task.title.isBlank()) {
             return Result.failure(IllegalArgumentException("El título no puede estar vacío"))
         }
+        if (task.description.isBlank()) {
+            return Result.failure(IllegalArgumentException("La descripción no puede estar vacía"))
+        }
         if (task.ownerId.isBlank()) {
             return Result.failure(IllegalArgumentException("El usuario no está autenticado"))
         }

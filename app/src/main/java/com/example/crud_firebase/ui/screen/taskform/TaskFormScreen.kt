@@ -33,6 +33,14 @@ fun TaskFormScreen(
     var title by remember { mutableStateOf(existingTask?.title ?: "") }
     var description by remember { mutableStateOf(existingTask?.description ?: "") }
 
+    // Actualizar campos cuando la tarea se cargue desde la base de datos
+    LaunchedEffect(existingTask) {
+        existingTask?.let {
+            title = it.title
+            description = it.description
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(

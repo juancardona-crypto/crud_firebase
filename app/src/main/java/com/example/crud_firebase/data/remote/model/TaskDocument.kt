@@ -4,7 +4,7 @@ import com.google.firebase.firestore.DocumentId
 
 data class TaskDocument(
     @DocumentId
-    val id: String = "",
+    val documentId: String = "",
     val ownerId: String = "",
     val title: String = "",
     val description: String = "",

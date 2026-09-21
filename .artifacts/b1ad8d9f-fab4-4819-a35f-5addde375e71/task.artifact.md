@@ -1,0 +1,3 @@
+- [ ] Update `TaskFormScreen.kt` to prepopulate fields and add UI validation
+- [ ] Update `CreateTaskUseCase.kt` and `UpdateTaskUseCase.kt` with domain validation
+- [ ] Update `TaskViewModel.kt` with ViewModel validation

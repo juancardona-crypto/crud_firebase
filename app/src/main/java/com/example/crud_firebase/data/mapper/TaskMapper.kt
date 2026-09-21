@@ -31,7 +31,7 @@ fun TaskDraft.toEntity(): TaskDraftEntity {
 
 fun TaskDocument.toDomain(): Task {
     return Task(
-        id = id,
+        id = documentId,
         ownerId = ownerId,
         title = title,
         description = description,
@@ -43,7 +43,7 @@ fun TaskDocument.toDomain(): Task {
 
 fun Task.toDocument(): TaskDocument {
     return TaskDocument(
-        id = id,
+        documentId = id,
         ownerId = ownerId,
         title = title,
         description = description,

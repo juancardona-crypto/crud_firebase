@@ -52,7 +52,7 @@ class TaskViewModel @Inject constructor(
 
     fun addTask(title: String, description: String = "") {
         val ownerId = authRepository.currentUserId ?: return
-        if (title.isBlank()) return
+        if (title.isBlank() || description.isBlank()) return
         viewModelScope.launch {
             val now = System.currentTimeMillis()
             createTaskUseCase(Task(title = title, description = description, ownerId = ownerId, createdAt = now, updatedAt = now))
